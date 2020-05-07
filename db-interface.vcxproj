@@ -131,7 +131,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\app\Murad-Dev\product\18.0.0\dbhomeXE\oci\include;C:\oraclexe\app\oracle\product\11.2.0\server\oci\include;C:\Program Files\PostgreSQL\12\include;C:\Program Files\PostgreSQL\12\include\libpq;C:\Program Files\PostgreSQL\10\include;$(SolutionDir)DBInt-Oracle\oclib\include;C:\Program Files\MySQL\include;$(SolutionDir)SodiumShared;$(SolutionDir)DBInt;$(SolutionDir)DBInt-Postgresql;$(SolutionDir)DBInt-Oracle;$(SolutionDir)DBInt-MySql;$(IncludePath)</IncludePath>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <OutDir>$(ProjectDir)$(Platform)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -144,7 +145,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\app\Murad-Dev\product\18.0.0\dbhomeXE\oci\include;C:\oraclexe\app\oracle\product\11.2.0\server\oci\include;C:\Program Files\PostgreSQL\12\include;C:\Program Files\PostgreSQL\12\include\libpq;C:\Program Files\PostgreSQL\10\include;$(SolutionDir)DBInt-Oracle\oclib\include;C:\Program Files\MySQL\include;$(SolutionDir)SodiumShared;$(SolutionDir)DBInt;$(SolutionDir)DBInt-Postgresql;$(SolutionDir)DBInt-Oracle;$(SolutionDir)DBInt-MySql;$(IncludePath)</IncludePath>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <OutDir>$(ProjectDir)$(Platform)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseForMe|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -180,13 +182,13 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\DBInt-MySql\x64\Debug;..\DBInt-Oracle\x64\Debug;..\DBInt-Postgresql\x64\Debug;..\SodiumShared\x64\Debug;C:\Program Files\PostgreSQL\12\lib;C:\Program Files\PostgreSQL\10\lib;$(SolutionDir)$(Platform)\$(Configuration)\;C:\oraclexe\app\oracle\product\11.2.0\server\oci\lib\MSVC;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\DBInt-MySql\x64\;..\DBInt-Oracle\x64\;..\DBInt-Postgresql\x64\;..\SodiumShared\x64\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <Version>0.3</Version>
       <AdditionalDependencies>SodiumShared.lib;DBInt-Oracle.lib;DBInt-Postgresql.lib;DBInt-Mysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <DelayLoadDLLs>DBInt-Oracle.dll;DBInt-Postgresql.dll;DBInt-MySql.dll</DelayLoadDLLs>
+      <DelayLoadDLLs>SodiumShared.dll;DBInt-Oracle.dll;DBInt-Postgresql.dll;DBInt-MySql.dll</DelayLoadDLLs>
     </Link>
     <PostBuildEvent>
-      <Command>copy $(SolutionDir)$(Platform)\$(Configuration)\DBInt.dll C:\projects\Sodium\Setup</Command>
+      <Command>copy $(ProjectDir)$(Platform)\DBInt.dll C:\projects\Sodium\Setup</Command>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>
@@ -260,9 +262,9 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Program Files\PostgreSQL\12\lib;C:\Program Files\PostgreSQL\10\lib;$(SolutionDir)$(Platform)\$(Configuration)\;C:\oraclexe\app\oracle\product\11.2.0\server\oci\lib\MSVC;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\DBInt-MySql\x64\;..\DBInt-Oracle\x64\;..\DBInt-Postgresql\x64\;..\SodiumShared\x64\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>SodiumShared.lib;DBInt-Oracle.lib;DBInt-Postgresql.lib;DBInt-Mysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <DelayLoadDLLs>DBInt-Oracle.dll;DBInt-Postgresql.dll;DBInt-MySql.dll</DelayLoadDLLs>
+      <DelayLoadDLLs>SodiumShared.dll;DBInt-Oracle.dll;DBInt-Postgresql.dll;DBInt-MySql.dll</DelayLoadDLLs>
       <Version>0.3</Version>
     </Link>
     <PreBuildEvent>
@@ -270,7 +272,7 @@
       </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>copy $(SolutionDir)$(Platform)\$(Configuration)\DBInt.dll C:\projects\Sodium\Setup</Command>
+      <Command>copy $(ProjectDir)$(Platform)\DBInt.dll C:\projects\Sodium\Setup</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseForMe|x64'">
