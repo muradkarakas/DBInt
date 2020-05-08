@@ -1,7 +1,5 @@
-// db-interface.cpp : Defines the exported functions for the DLL application.
-//
+#include "pch.h"
 
-#include "stdafx.h"
 #include "db-interface.h"
 #include <libloaderapi.h>
 
@@ -9,11 +7,16 @@
 #include "..\DBInt-Postgresql\postgresql-interface.h"
 #include "..\DBInt-MySql\mysql-interface.h"
 
-DBINTERFACE_API const char * DBInt_GetDatabaseType(DBInt_Connection *mkDBConnection) {
-	mkDBConnection->errText = NULL;
 
-	if (mkDBConnection) {
-		switch (mkDBConnection->dbType) {
+DBINTERFACE_API 
+const char * 
+DBInt_GetDatabaseType(
+	DBInt_Connection * DBIntConnection
+)
+{
+	DBIntConnection->errText = NULL;
+	if (DBIntConnection) {
+		switch (DBIntConnection->dbType) {
 			case SODIUM_ORACLE_SUPPORT: {
 				return "oracle";
 			}
@@ -22,19 +25,23 @@ DBINTERFACE_API const char * DBInt_GetDatabaseType(DBInt_Connection *mkDBConnect
 			}
 		}
 	}
-
 	return NULL;
 }
 
-DBINTERFACE_API char* DBInt_GetDatabaseName(DBInt_Connection *mkDBConnection) {
-	char *retval;
-	switch (mkDBConnection->dbType) {
+DBINTERFACE_API 
+char * 
+DBInt_GetDatabaseName(
+	DBInt_Connection * DBIntConnection
+)
+{
+	char *retval = "";
+	switch (DBIntConnection->dbType) {
 		case SODIUM_ORACLE_SUPPORT: {
-			retval = oracleGetDatabaseName(mkDBConnection);
+			retval = oracleGetDatabaseName(DBIntConnection);
 			break;
 		}
 		case SODIUM_POSTGRESQL_SUPPORT: {
-			retval = postgresqlGetDatabaseName(mkDBConnection);
+			retval = postgresqlGetDatabaseName(DBIntConnection);
 			break;
 		}
 	}
@@ -42,7 +49,11 @@ DBINTERFACE_API char* DBInt_GetDatabaseName(DBInt_Connection *mkDBConnection) {
 }
 
 
-void DBInt_InitConnection(DBInt_Connection * conn) {
+void 
+DBInt_InitConnection(
+	DBInt_Connection * conn
+)
+{
 	if (conn == NULL) {
 		return;
 	}
@@ -100,45 +111,62 @@ DBInt_CreateDBConnection(
 	return conn;
 }
 
-DBINTERFACE_API void DBInt_BindLob(DBInt_Connection *mkDBConnection, DBInt_Statement *stm, const char *imageFileName, char *bindVariableName) {
-	switch (mkDBConnection->dbType) {
+DBINTERFACE_API
+void 
+DBInt_BindLob(
+	DBInt_Connection * conn, 
+	DBInt_Statement * stm, 
+	const char * imageFileName, 
+	char * bindVariableName
+)
+{
+	switch (conn->dbType) {
 		case SODIUM_ORACLE_SUPPORT: {
-			oracleBindLob(mkDBConnection, stm, imageFileName, bindVariableName);
+			oracleBindLob(conn, stm, imageFileName, bindVariableName);
 			break;
 		}
 		case SODIUM_POSTGRESQL_SUPPORT: {
-			postgresqlBindLob(mkDBConnection, stm, imageFileName, bindVariableName);
+			postgresqlBindLob(conn, stm, imageFileName, bindVariableName);
 			break;
 		}
 	}
 }
 
-DBINTERFACE_API void *DBInt_GetLob(DBInt_Connection * mkConnection, DBInt_Statement *stm, const char *columnName, DWORD *sizeOfValue, BOOL isBase64Excoded) {
+DBINTERFACE_API 
+void * 
+DBInt_GetLob(
+	DBInt_Connection * conn, 
+	DBInt_Statement * stm, 
+	const char * columnName, 
+	DWORD * sizeOfValue, 
+	BOOL isBase64Excoded
+)
+{
 	void *lobContent = NULL;
 	void *lobContentRetValue = NULL;
 
-	mkConnection->errText = NULL;
+	conn->errText = NULL;
 	*sizeOfValue = 0;
 
-	switch (mkConnection->dbType) {
+	switch (conn->dbType) {
 		case SODIUM_ORACLE_SUPPORT: {
-			lobContent = oracleGetLob(mkConnection, stm, columnName, sizeOfValue);
+			lobContent = oracleGetLob(conn, stm, columnName, sizeOfValue);
 			break;
 		}
 		case SODIUM_POSTGRESQL_SUPPORT: {
-			lobContent = postgresqlGetLob(mkConnection, stm, columnName, sizeOfValue);
+			lobContent = postgresqlGetLob(conn, stm, columnName, sizeOfValue);
 			break;
 		}
 	}
 
 	if (lobContent) {
 		if (isBase64Excoded) {
-			void *b64encoded = mkBase64Encode(mkConnection->heapHandle, (unsigned char*)lobContent, *sizeOfValue);
+			void *b64encoded = mkBase64Encode(conn->heapHandle, (unsigned char*)lobContent, *sizeOfValue);
 			if (b64encoded) {
-				lobContentRetValue = mkStrcat(mkConnection->heapHandle, __FILE__, __LINE__, "data:image;base64,", b64encoded, NULL);
+				lobContentRetValue = mkStrcat(conn->heapHandle, __FILE__, __LINE__, "data:image;base64,", b64encoded, NULL);
 				*sizeOfValue = (DWORD) strlen((char*)lobContentRetValue);
-				mkFree(mkConnection->heapHandle, b64encoded);
-				mkFree(mkConnection->heapHandle, lobContent);
+				mkFree(conn->heapHandle, b64encoded);
+				mkFree(conn->heapHandle, lobContent);
 				lobContent = NULL;
 			}			
 		}
@@ -153,54 +181,76 @@ DBINTERFACE_API void *DBInt_GetLob(DBInt_Connection * mkConnection, DBInt_Statem
 
 
 
-DBINTERFACE_API void DBInt_RegisterString(DBInt_Connection *mkDBConnection, DBInt_Statement *stm, const char *bindVariableName, int maxLength) {
-	switch (mkDBConnection->dbType) {
+DBINTERFACE_API
+void 
+DBInt_RegisterString(
+	DBInt_Connection * conn, 
+	DBInt_Statement * stm, 
+	const char * bindVariableName, 
+	int maxLength
+)
+{
+	switch (conn->dbType) {
 		case SODIUM_ORACLE_SUPPORT: {
-			oracleRegisterString(mkDBConnection, stm, bindVariableName, maxLength);
+			oracleRegisterString(conn, stm, bindVariableName, maxLength);
 			break;
 		}
 		case SODIUM_POSTGRESQL_SUPPORT: {
-			postgresqlRegisterString(mkDBConnection, stm, bindVariableName, maxLength);
+			postgresqlRegisterString(conn, stm, bindVariableName, maxLength);
 			break;
 		}
 	}
 }
 
 
-DBINTERFACE_API void DBInt_ExecuteDeleteStatement(DBInt_Connection *mkDBConnection, DBInt_Statement *stm, const char *sql) {
-	if (mkDBConnection && sql) {
-		mkDBConnection->errText = NULL;
-		switch (mkDBConnection->dbType) {
+DBINTERFACE_API
+void 
+DBInt_ExecuteDeleteStatement(
+	DBInt_Connection * conn, 
+	DBInt_Statement * stm, 
+	const char * sql
+)
+{
+	if (conn && sql) {
+		conn->errText = NULL;
+		switch (conn->dbType) {
 			case SODIUM_ORACLE_SUPPORT: {
-				oracleExecuteDeleteStatement(mkDBConnection, stm, sql);
+				oracleExecuteDeleteStatement(conn, stm, sql);
 				break;
 			}
 			case SODIUM_POSTGRESQL_SUPPORT: {
-				postgresqlExecuteDeleteStatement(mkDBConnection, stm, sql);
+				postgresqlExecuteDeleteStatement(conn, stm, sql);
 				break;
 			}
 			case SODIUM_MYSQL_SUPPORT: {
-				mysqlExecuteDeleteStatement(mkDBConnection, stm, sql);
+				mysqlExecuteDeleteStatement(conn, stm, sql);
 				break;
 			}
 		}
 	}
 }
 
-DBINTERFACE_API void DBInt_ExecuteAnonymousBlock(DBInt_Connection *mkDBConnection, DBInt_Statement *stm, const char *sql) {
-	if (mkDBConnection && sql) {
-		mkDBConnection->errText = NULL;
-		switch (mkDBConnection->dbType) {
+DBINTERFACE_API
+void 
+DBInt_ExecuteAnonymousBlock(
+	DBInt_Connection * conn,
+	DBInt_Statement * stm, 
+	const char * sql
+)
+{
+	if (conn && sql) {
+		conn->errText = NULL;
+		switch (conn->dbType) {
 			case SODIUM_ORACLE_SUPPORT: {
-				oracleExecuteAnonymousBlock(mkDBConnection, stm, sql);
+				oracleExecuteAnonymousBlock(conn, stm, sql);
 				break;
 			}
 			case SODIUM_POSTGRESQL_SUPPORT: {
-				postgresqlExecuteAnonymousBlock(mkDBConnection, stm, sql);
+				postgresqlExecuteAnonymousBlock(conn, stm, sql);
 				break;
 			}
 			case SODIUM_MYSQL_SUPPORT: {
-				mysqlExecuteAnonymousBlock(mkDBConnection, stm, sql);
+				mysqlExecuteAnonymousBlock(conn, stm, sql);
 				break;
 			}
 		}
@@ -208,95 +258,129 @@ DBINTERFACE_API void DBInt_ExecuteAnonymousBlock(DBInt_Connection *mkDBConnectio
 }
 
 
-DBINTERFACE_API void DBInt_ExecuteUpdateStatement(DBInt_Connection *mkDBConnection, DBInt_Statement *stm, const char *sql) {
-	if (mkDBConnection && sql) {
-		switch (mkDBConnection->dbType) {
+DBINTERFACE_API
+void 
+DBInt_ExecuteUpdateStatement(
+	DBInt_Connection * conn, 
+	DBInt_Statement * stm, 
+	const char * sql
+)
+{
+	if (conn && sql) {
+		switch (conn->dbType) {
 			case SODIUM_ORACLE_SUPPORT: {
-				oracleExecuteUpdateStatement(mkDBConnection, stm, sql);
+				oracleExecuteUpdateStatement(conn, stm, sql);
 				break;
 			}
 			case SODIUM_POSTGRESQL_SUPPORT: {
-				postgresqlExecuteUpdateStatement(mkDBConnection, stm, sql);
+				postgresqlExecuteUpdateStatement(conn, stm, sql);
 				break;
 			}
 			case SODIUM_MYSQL_SUPPORT: {
-				mysqlExecuteUpdateStatement(mkDBConnection, stm, sql);
+				mysqlExecuteUpdateStatement(conn, stm, sql);
 				break;
 			}
 		}
 	}
 }
 
-DBINTERFACE_API void	DBInt_ExecuteDescribe(DBInt_Connection *mkDBConnection, DBInt_Statement *stm, const char *sql) {
-	if (mkDBConnection && (stm || sql)) {
-		mkDBConnection->errText = NULL;
-		switch (mkDBConnection->dbType) {
+DBINTERFACE_API
+void
+DBInt_ExecuteDescribe(
+	DBInt_Connection * conn, 
+	DBInt_Statement * stm, 
+	const char * sql
+)
+{
+	if (conn && (stm || sql)) {
+		conn->errText = NULL;
+		switch (conn->dbType) {
 			case SODIUM_ORACLE_SUPPORT: {
-				oracleExecuteDescribe(mkDBConnection, stm, sql);
+				oracleExecuteDescribe(conn, stm, sql);
 				break;
 			}
 			case SODIUM_POSTGRESQL_SUPPORT: {
-				postgresqlExecuteDescribe(mkDBConnection, stm, sql);
+				postgresqlExecuteDescribe(conn, stm, sql);
 				break;
 			}
 			case SODIUM_MYSQL_SUPPORT: {
-				mysqlExecuteDescribe(mkDBConnection, stm, sql);
+				mysqlExecuteDescribe(conn, stm, sql);
 				break;
 			}
 		}
 	}
 }
 
-DBINTERFACE_API void	DBInt_ExecuteSelectStatement(DBInt_Connection *mkDBConnection, DBInt_Statement *stm, const char *sql) {
-	if (mkDBConnection && (stm || sql)) {
-		switch (mkDBConnection->dbType) {
+DBINTERFACE_API 
+void
+DBInt_ExecuteSelectStatement(
+	DBInt_Connection * conn, 
+	DBInt_Statement * stm, 
+	const char * sql
+)
+{
+	if (conn && (stm || sql)) {
+		switch (conn->dbType) {
 			case SODIUM_ORACLE_SUPPORT: {
-				oracleExecuteSelectStatement(mkDBConnection, stm, sql);
+				oracleExecuteSelectStatement(conn, stm, sql);
 				break;
 			}
 			case SODIUM_POSTGRESQL_SUPPORT: {
-				postgresqlExecuteSelectStatement(mkDBConnection, stm, sql);
+				postgresqlExecuteSelectStatement(conn, stm, sql);
 				break;
 			}
 			case SODIUM_MYSQL_SUPPORT: {
-				mysqlExecuteSelectStatement(mkDBConnection, stm, sql);
+				mysqlExecuteSelectStatement(conn, stm, sql);
 				break;
 			}
 		}
 	}
 }
 
-DBINTERFACE_API void	DBInt_Prepare(DBInt_Connection * mkConnection, DBInt_Statement *stm, const char *sql) {
-	switch (mkConnection->dbType) {
+DBINTERFACE_API 
+void
+DBInt_Prepare(
+	DBInt_Connection * conn,
+	DBInt_Statement * stm, 
+	const char * sql
+)
+{
+	switch (conn->dbType) {
 		case SODIUM_ORACLE_SUPPORT: {
-			oraclePrepare(mkConnection, stm, sql);
+			oraclePrepare(conn, stm, sql);
 			break;
 		}
 		case SODIUM_POSTGRESQL_SUPPORT: {
-			postgresqlPrepare(mkConnection, stm, sql);
+			postgresqlPrepare(conn, stm, sql);
 			break;
 		}
 		case SODIUM_MYSQL_SUPPORT: {
-			mysqlPrepare(mkConnection, stm, sql);
+			mysqlPrepare(conn, stm, sql);
 			break;
 		}
 	}
 }
 
-DBINTERFACE_API char * DBInt_ExecuteInsertStatement(DBInt_Connection *mkDBConnection, DBInt_Statement *stm, const char *sql) {
-	char *retval = NULL;
-	if (mkDBConnection) {
-		switch (mkDBConnection->dbType) {
+DBINTERFACE_API
+char * 
+DBInt_ExecuteInsertStatement(
+	DBInt_Connection * conn, 
+	DBInt_Statement * stm, 
+	const char * sql)
+{
+	char * retval = NULL;
+	if (conn) {
+		switch (conn->dbType) {
 			case SODIUM_ORACLE_SUPPORT: {
-				retval = oracleExecuteInsertStatement(mkDBConnection, stm, sql);
+				retval = oracleExecuteInsertStatement(conn, stm, sql);
 				break;
 			}
 			case SODIUM_POSTGRESQL_SUPPORT: {
-				retval = postgresqlExecuteInsertStatement(mkDBConnection, stm, sql);
+				retval = postgresqlExecuteInsertStatement(conn, stm, sql);
 				break;
 			}
 			case SODIUM_MYSQL_SUPPORT: {
-				retval = mysqlExecuteInsertStatement(mkDBConnection, stm, sql);
+				retval = mysqlExecuteInsertStatement(conn, stm, sql);
 				break;
 			}
 		}
@@ -304,96 +388,123 @@ DBINTERFACE_API char * DBInt_ExecuteInsertStatement(DBInt_Connection *mkDBConnec
 	return retval;
 }
 
-DBINTERFACE_API void DBInt_BindString(DBInt_Connection *mkDBConnection, DBInt_Statement *stm, char *bindVariableName, char *bindVariableValue, size_t valueLength) {
-	switch (mkDBConnection->dbType) {
-		case SODIUM_ORACLE_SUPPORT: {
-			oracleBindString(mkDBConnection, stm, bindVariableName, bindVariableValue, valueLength);
-			break;
-		}
-		case SODIUM_POSTGRESQL_SUPPORT: {
-			postgresqlBindString(mkDBConnection, stm, bindVariableName, bindVariableValue, valueLength);
-			break;
-		}
-		case SODIUM_MYSQL_SUPPORT: {
-			mysqlBindString(mkDBConnection, stm, bindVariableName, bindVariableValue, valueLength);
-			break;
-		}
-	}
-}
-
-DBINTERFACE_API void DBInt_BindNumber(
-	DBInt_Connection *mkDBConnection, 
-	DBInt_Statement *stm, 
-	char *bindVariableName, 
-	char *bindVariableValue, 
+DBINTERFACE_API
+void 
+DBInt_BindString(
+	DBInt_Connection * conn, 
+	DBInt_Statement * stm, 
+	char * bindVariableName, 
+	char * bindVariableValue, 
 	size_t valueLength
 )
 {
-	switch (mkDBConnection->dbType) {
+	switch (conn->dbType) {
 		case SODIUM_ORACLE_SUPPORT: {
-			oracleBindString(mkDBConnection, stm, bindVariableName, bindVariableValue, valueLength);
+			oracleBindString(conn, stm, bindVariableName, bindVariableValue, valueLength);
 			break;
 		}
 		case SODIUM_POSTGRESQL_SUPPORT: {
-			postgresqlBindString(mkDBConnection, stm, bindVariableName, bindVariableValue, valueLength);
+			postgresqlBindString(conn, stm, bindVariableName, bindVariableValue, valueLength);
 			break;
 		}
 		case SODIUM_MYSQL_SUPPORT: {
-			mysqlBindNumber(mkDBConnection, stm, bindVariableName, bindVariableValue, valueLength);
+			mysqlBindString(conn, stm, bindVariableName, bindVariableValue, valueLength);
 			break;
 		}
 	}
 }
 
-DBINTERFACE_API unsigned int DBInt_GetAffectedRows(DBInt_Connection *mkDBConnection, DBInt_Statement *stm) {
-	int retval;
-	switch (mkDBConnection->dbType) {
+DBINTERFACE_API
+void 
+DBInt_BindNumber(
+	DBInt_Connection * conn, 
+	DBInt_Statement * stm, 
+	char * bindVariableName, 
+	char * bindVariableValue, 
+	size_t valueLength
+)
+{
+	switch (conn->dbType) {
 		case SODIUM_ORACLE_SUPPORT: {
-			retval = oracleGetAffectedRows(mkDBConnection, stm);
+			oracleBindString(conn, stm, bindVariableName, bindVariableValue, valueLength);
 			break;
 		}
 		case SODIUM_POSTGRESQL_SUPPORT: {
-			retval = postgresqlGetAffectedRows(mkDBConnection, stm);
+			postgresqlBindString(conn, stm, bindVariableName, bindVariableValue, valueLength);
+			break;
+		}
+		case SODIUM_MYSQL_SUPPORT: {
+			mysqlBindNumber(conn, stm, bindVariableName, bindVariableValue, valueLength);
 			break;
 		}
 	}
-	return retval;
 }
 
-DBINTERFACE_API int DBInt_GetColumnCount(DBInt_Connection *mkDBConnection, DBInt_Statement *stm) {
+DBINTERFACE_API 
+unsigned int 
+DBInt_GetAffectedRows(
+	DBInt_Connection * conn, 
+	DBInt_Statement * stm
+)
+{
 	int retval = 0;
-	switch (mkDBConnection->dbType) {
+	switch (conn->dbType) {
 		case SODIUM_ORACLE_SUPPORT: {
-			retval = oracleGetColumnCount(mkDBConnection, stm);
+			retval = oracleGetAffectedRows(conn, stm);
 			break;
 		}
 		case SODIUM_POSTGRESQL_SUPPORT: {
-			retval = postgresqlGetColumnCount(mkDBConnection, stm);
-			break;
-		}
-		case SODIUM_MYSQL_SUPPORT: {
-			retval = mysqlGetColumnCount(mkDBConnection, stm);
+			retval = postgresqlGetAffectedRows(conn, stm);
 			break;
 		}
 	}
 	return retval;
 }
 
-DBINTERFACE_API BOOL DBInt_Rollback(DBInt_Connection *mkDBConnection) {
-	BOOL retval;
-	mkDBConnection->errText = NULL;
-
-	switch (mkDBConnection->dbType) {
+DBINTERFACE_API
+int 
+DBInt_GetColumnCount(
+	DBInt_Connection * conn, 
+	DBInt_Statement * stm
+)
+{
+	int retval = 0;
+	switch (conn->dbType) {
 		case SODIUM_ORACLE_SUPPORT: {
-			retval = oracleRollback(mkDBConnection);
+			retval = oracleGetColumnCount(conn, stm);
 			break;
 		}
 		case SODIUM_POSTGRESQL_SUPPORT: {
-			retval = postgresqlRollback(mkDBConnection);
+			retval = postgresqlGetColumnCount(conn, stm);
 			break;
 		}
 		case SODIUM_MYSQL_SUPPORT: {
-			retval = mysqlRollback(mkDBConnection);
+			retval = mysqlGetColumnCount(conn, stm);
+			break;
+		}
+	}
+	return retval;
+}
+
+DBINTERFACE_API
+BOOL 
+DBInt_Rollback(
+	DBInt_Connection * conn
+)
+{
+	BOOL retval = FALSE;
+	conn->errText = NULL;
+	switch (conn->dbType) {
+		case SODIUM_ORACLE_SUPPORT: {
+			retval = oracleRollback(conn);
+			break;
+		}
+		case SODIUM_POSTGRESQL_SUPPORT: {
+			retval = postgresqlRollback(conn);
+			break;
+		}
+		case SODIUM_MYSQL_SUPPORT: {
+			retval = mysqlRollback(conn);
 			break;
 		}
 	}
@@ -401,21 +512,25 @@ DBINTERFACE_API BOOL DBInt_Rollback(DBInt_Connection *mkDBConnection) {
 }
 
 
-DBINTERFACE_API BOOL DBInt_Commit(DBInt_Connection *mkDBConnection) {
-	BOOL retval;
-	mkDBConnection->errText = NULL;
-
-	switch (mkDBConnection->dbType) {
+DBINTERFACE_API
+BOOL 
+DBInt_Commit(
+	DBInt_Connection * conn
+)
+{
+	BOOL retval = FALSE;
+	conn->errText = NULL;
+	switch (conn->dbType) {
 		case SODIUM_ORACLE_SUPPORT: {
-			retval = oracleCommit(mkDBConnection);
+			retval = oracleCommit(conn);
 			break;
 		}
 		case SODIUM_POSTGRESQL_SUPPORT: {
-			retval = postgresqlCommit(mkDBConnection);
+			retval = postgresqlCommit(conn);
 			break;
 		}
 		case SODIUM_MYSQL_SUPPORT: {
-			retval = mysqlCommit(mkDBConnection);
+			retval = mysqlCommit(conn);
 			break;
 		}
 	}
@@ -425,54 +540,61 @@ DBINTERFACE_API BOOL DBInt_Commit(DBInt_Connection *mkDBConnection) {
 DBINTERFACE_API 
 char *
 DBInt_GetPrimaryKeyColumn(
-	DBInt_Connection *mkDBConnection, 
+	DBInt_Connection *conn, 
 	const char *schemaName,
 	const char *tableName,
 	int			position
 )
 {
 	char * retval;
-	mkDBConnection->errText = NULL;
-
-	switch (mkDBConnection->dbType) {
+	conn->errText = NULL;
+	switch (conn->dbType) {
 		case SODIUM_ORACLE_SUPPORT: {
-			retval = oracleGetPrimaryKeyColumn(mkDBConnection, schemaName, tableName, position);
+			retval = oracleGetPrimaryKeyColumn(conn, schemaName, tableName, position);
 			break;
 		}
 		case SODIUM_POSTGRESQL_SUPPORT: {
-			retval = postgresqlGetPrimaryKeyColumn(mkDBConnection, schemaName, tableName, position);
+			retval = postgresqlGetPrimaryKeyColumn(conn, schemaName, tableName, position);
 			break;
 		}
 	}
 	return retval;
 }
 
-DBINTERFACE_API int DBInt_GetLastError(DBInt_Connection *mkDBConnection) {
-	int retval;
-
-	switch (mkDBConnection->dbType) {
+DBINTERFACE_API
+int 
+DBInt_GetLastError(
+	DBInt_Connection * conn
+)
+{
+	int retval = 0;
+	switch (conn->dbType) {
 		case SODIUM_ORACLE_SUPPORT: {
-			retval = oracleGetLastError(mkDBConnection);
+			retval = oracleGetLastError(conn);
 			break;
 		}
 		case SODIUM_POSTGRESQL_SUPPORT: {
-			retval = postgresqlGetLastError(mkDBConnection);
+			retval = postgresqlGetLastError(conn);
 			break;
 		}
 	}
 	return retval;
 }
 
-DBINTERFACE_API const char * DBInt_GetLastErrorText(DBInt_Connection *mkDBConnection) {
+DBINTERFACE_API
+const char * 
+DBInt_GetLastErrorText(
+	DBInt_Connection * conn
+)
+{
 	const char *retval = NULL;
-
-	switch (mkDBConnection->dbType) {
+	switch (conn->dbType) {
 		case SODIUM_ORACLE_SUPPORT: {
-			retval = oracleGetLastErrorText(mkDBConnection);
+			retval = oracleGetLastErrorText(conn);
 			break;
 		}
 		case SODIUM_POSTGRESQL_SUPPORT: {
-			retval = postgresqlGetLastErrorText(mkDBConnection);
+			retval = postgresqlGetLastErrorText(conn);
 			break;
 		}
 	}
@@ -480,71 +602,87 @@ DBINTERFACE_API const char * DBInt_GetLastErrorText(DBInt_Connection *mkDBConnec
 }
 
 
-DBINTERFACE_API void DBInt_Seek(DBInt_Connection *mkDBConnection, DBInt_Statement *stm, int rowNum) {
-	
-	mkDBConnection->errText = NULL;
-	switch (mkDBConnection->dbType) {
+DBINTERFACE_API
+void
+DBInt_Seek(
+	DBInt_Connection * conn, 
+	DBInt_Statement * stm,
+	int rowNum
+)
+{
+	conn->errText = NULL;
+	switch (conn->dbType) {
 		case SODIUM_ORACLE_SUPPORT: {
-			oracleSeek(mkDBConnection, stm, rowNum);
+			oracleSeek(conn, stm, rowNum);
 			break;
 		}
 		case SODIUM_POSTGRESQL_SUPPORT: {
-			postgresqlSeek(mkDBConnection, stm, rowNum);
+			postgresqlSeek(conn, stm, rowNum);
 			break;
 		}
 		case SODIUM_MYSQL_SUPPORT: {
-			mysqlSeek(mkDBConnection, stm, rowNum);
+			mysqlSeek(conn, stm, rowNum);
 			break;
 		}
 	}
-	
 }
 
-DBINTERFACE_API DBInt_Statement	*DBInt_CreateStatement(DBInt_Connection *mkDBConnection) {
+DBINTERFACE_API
+DBInt_Statement	* 
+DBInt_CreateStatement(
+	DBInt_Connection * conn
+)
+{
 	DBInt_Statement	*retval = NULL;
-
-	switch (mkDBConnection->dbType) {
+	switch (conn->dbType) {
 		case SODIUM_ORACLE_SUPPORT: {
-			retval = oracleCreateStatement(mkDBConnection);
+			retval = oracleCreateStatement(conn);
 			break;
 		}
 		case SODIUM_POSTGRESQL_SUPPORT: {
-			retval = postgresqlCreateStatement(mkDBConnection);
+			retval = postgresqlCreateStatement(conn);
 			break;
 		}
 		case SODIUM_MYSQL_SUPPORT: {
-			retval = mysqlCreateStatement(mkDBConnection);
+			retval = mysqlCreateStatement(conn);
 			break;
 		}
 	}
-
 	return retval;
 }
 	
 
-DBINTERFACE_API void	DBInt_FreeStatement(DBInt_Connection *mkDBConnection, DBInt_Statement *stm) {
-
-	switch (mkDBConnection->dbType) {
+DBINTERFACE_API 
+void
+DBInt_FreeStatement(
+	DBInt_Connection * conn,
+	DBInt_Statement * stm
+)
+{
+	switch (conn->dbType) {
 		case SODIUM_ORACLE_SUPPORT: {
-			oracleFreeStatement(mkDBConnection, stm);
+			oracleFreeStatement(conn, stm);
 			break;
 		}
 		case SODIUM_POSTGRESQL_SUPPORT: {
-			postgresqlFreeStatement(mkDBConnection, stm);
+			postgresqlFreeStatement(conn, stm);
 			break;
 		}
 		case SODIUM_MYSQL_SUPPORT: {
-			mysqlFreeStatement(mkDBConnection, stm);
+			mysqlFreeStatement(conn, stm);
 			break;
 		}
 	}
-
 }
 
-DBINTERFACE_API int DBInt_Next(DBInt_Connection *mkDBConnection, DBInt_Statement *stm) {
+DBINTERFACE_API
+int DBInt_Next(
+	DBInt_Connection *conn, 
+	DBInt_Statement * stm
+)
+{
 	int retval;
-
-	switch (mkDBConnection->dbType) {
+	switch (conn->dbType) {
 		case SODIUM_ORACLE_SUPPORT: {
 			retval = oracleNext(stm);
 			break;
@@ -562,10 +700,16 @@ DBINTERFACE_API int DBInt_Next(DBInt_Connection *mkDBConnection, DBInt_Statement
 	return retval;
 }
 
-DBINTERFACE_API void DBInt_First(DBInt_Connection *mkDBConnection, DBInt_Statement *stm) {
-	switch (mkDBConnection->dbType) {
+DBINTERFACE_API 
+void 
+DBInt_First(
+	DBInt_Connection *conn,
+	DBInt_Statement *stm
+)
+{
+	switch (conn->dbType) {
 		case SODIUM_ORACLE_SUPPORT: {
-			oracleFirst(mkDBConnection, stm);
+			oracleFirst(conn, stm);
 			break;
 		}
 		case SODIUM_POSTGRESQL_SUPPORT: {
@@ -573,16 +717,22 @@ DBINTERFACE_API void DBInt_First(DBInt_Connection *mkDBConnection, DBInt_Stateme
 			break;
 		}
 		case SODIUM_MYSQL_SUPPORT: {
-			mysqlFirst(mkDBConnection, stm);
+			mysqlFirst(conn, stm);
 			break;
 		}
 	}
 }
 
-DBINTERFACE_API void DBInt_Last(DBInt_Connection *mkDBConnection, DBInt_Statement *stm) {
-	switch (mkDBConnection->dbType) {
+DBINTERFACE_API 
+void 
+DBInt_Last(
+	DBInt_Connection *conn, 
+	DBInt_Statement *stm
+)
+{
+	switch (conn->dbType) {
 		case SODIUM_ORACLE_SUPPORT: {
-			oracleLast(mkDBConnection, stm);
+			oracleLast(conn, stm);
 			break;
 		}
 		case SODIUM_POSTGRESQL_SUPPORT: {
@@ -590,15 +740,21 @@ DBINTERFACE_API void DBInt_Last(DBInt_Connection *mkDBConnection, DBInt_Statemen
 			break;
 		}
 		case SODIUM_MYSQL_SUPPORT: {
-			mysqlLast(mkDBConnection, stm);
+			mysqlLast(conn, stm);
 			break;
 		}
 	}
 }
 
-DBINTERFACE_API int DBInt_Prev(DBInt_Connection *mkDBConnection, DBInt_Statement *stm) {
+DBINTERFACE_API
+int 
+DBInt_Prev(
+	DBInt_Connection *conn, 
+	DBInt_Statement *stm
+)
+{
 	int retval;
-	switch (mkDBConnection->dbType) {
+	switch (conn->dbType) {
 		case SODIUM_ORACLE_SUPPORT: {
 			retval = oraclePrev(stm);
 			break;
@@ -615,10 +771,15 @@ DBINTERFACE_API int DBInt_Prev(DBInt_Connection *mkDBConnection, DBInt_Statement
 	return retval;
 }
 
-DBINTERFACE_API int	DBInt_IsEof(DBInt_Connection *mkDBConnection, DBInt_Statement *stm) {
+DBINTERFACE_API 
+int	
+DBInt_IsEof(
+	DBInt_Connection *conn, 
+	DBInt_Statement *stm
+)
+{
 	int retval = FALSE;
-
-	switch (mkDBConnection->dbType) {
+	switch (conn->dbType) {
 		case SODIUM_ORACLE_SUPPORT: {
 			retval = oracleIsEof(stm);
 			break;
@@ -632,72 +793,89 @@ DBINTERFACE_API int	DBInt_IsEof(DBInt_Connection *mkDBConnection, DBInt_Statemen
 			break;
 		}
 	}
-
 	return retval;
 }
 
-DBINTERFACE_API BOOL DBInt_IsDatabaseSupported(DBInt_SupportedDatabaseType dbType) {
+DBINTERFACE_API 
+BOOL 
+DBInt_IsDatabaseSupported(
+	DBInt_SupportedDatabaseType dbType
+)
+{
 	return (dbType == SODIUM_ORACLE_SUPPORT || dbType == SODIUM_POSTGRESQL_SUPPORT || dbType == SODIUM_MYSQL_SUPPORT);
 }
 
-DBINTERFACE_API int DBInt_IsConnectionOpen(DBInt_Connection * mkDBConnection)
+DBINTERFACE_API 
+int 
+DBInt_IsConnectionOpen(
+	DBInt_Connection * conn
+)
 {
 	int retval;
-
-	switch (mkDBConnection->dbType) {
+	switch (conn->dbType) {
 		case SODIUM_ORACLE_SUPPORT: {
-			retval = oracleIsConnectionOpen(mkDBConnection);
+			retval = oracleIsConnectionOpen(conn);
 			break;
 		}
 		case SODIUM_POSTGRESQL_SUPPORT: {
-			retval = postgresqlIsConnectionOpen(mkDBConnection);
+			retval = postgresqlIsConnectionOpen(conn);
 			break;
 		}
 		case SODIUM_MYSQL_SUPPORT: {
-			retval = mysqlIsConnectionOpen(mkDBConnection);
+			retval = mysqlIsConnectionOpen(conn);
 			break;
 		}
 	}
-
 	return retval;
 }
 
-DBINTERFACE_API void DBInt_DestroyDBConnection(DBInt_Connection *mkDBConnection) {
-	if (mkDBConnection) {
-		switch (mkDBConnection->dbType) {
+DBINTERFACE_API 
+void 
+DBInt_DestroyDBConnection(
+	DBInt_Connection *conn
+) 
+{
+	if (conn) {
+		switch (conn->dbType) {
 			case SODIUM_ORACLE_SUPPORT: {
-				oracleDestroyConnection(mkDBConnection);
+				oracleDestroyConnection(conn);
 				break;
 			}
 			case SODIUM_POSTGRESQL_SUPPORT: {
-				postgresqlDestroyConnection(mkDBConnection);
+				postgresqlDestroyConnection(conn);
 				break;
 			}
 			case SODIUM_MYSQL_SUPPORT: {
-				mysqlDestroyConnection(mkDBConnection);
+				mysqlDestroyConnection(conn);
 				break;
 			}
 		}
-		mkFree(mkDBConnection->heapHandle, mkDBConnection);
+		mkFree(conn->heapHandle, conn);
 	}
 }
 
 
-DBINTERFACE_API const char	*DBInt_GetColumnValueByColumnName(DBInt_Connection *mkDBConnection, DBInt_Statement *stm, const char *columnName) {
+DBINTERFACE_API 
+const char*
+DBInt_GetColumnValueByColumnName(
+	DBInt_Connection *conn, 
+	DBInt_Statement *stm, 
+	const char *columnName
+)
+{
 	const char	*ret = NULL;
-
-	if (mkDBConnection && columnName) {
-		switch (mkDBConnection->dbType) {
+	if (conn && columnName) {
+		switch (conn->dbType) {
 			case SODIUM_ORACLE_SUPPORT: {
-				ret = oracleGetColumnValueByColumnName(mkDBConnection, stm, columnName);
+				ret = oracleGetColumnValueByColumnName(conn, stm, columnName);
 				break;
 			}
 			case SODIUM_POSTGRESQL_SUPPORT: {
-				ret = postgresqlGetColumnValueByColumnName(mkDBConnection, stm, columnName);
+				ret = postgresqlGetColumnValueByColumnName(conn, stm, columnName);
 				break;
 			}
 			case SODIUM_MYSQL_SUPPORT: {
-				ret = mysqlGetColumnValueByColumnName(mkDBConnection, stm, columnName);
+				ret = mysqlGetColumnValueByColumnName(conn, stm, columnName);
 				break;
 			}
 		}
@@ -706,20 +884,26 @@ DBINTERFACE_API const char	*DBInt_GetColumnValueByColumnName(DBInt_Connection *m
 }
 
 
-DBINTERFACE_API const char * DBInt_GetColumnNameByIndex(DBInt_Connection *mkDBConnection, DBInt_Statement *stm, unsigned int index) {
+DBINTERFACE_API 
+const char * 
+DBInt_GetColumnNameByIndex(
+	DBInt_Connection *conn, 
+	DBInt_Statement *stm, 
+	unsigned int index
+)
+{
 	const char	*columnName = NULL;
-
-	switch (mkDBConnection->dbType) {
+	switch (conn->dbType) {
 		case SODIUM_ORACLE_SUPPORT: {
-			columnName = oracleGetColumnNameByIndex(mkDBConnection, stm, index);
+			columnName = oracleGetColumnNameByIndex(conn, stm, index);
 			break;
 		}
 		case SODIUM_POSTGRESQL_SUPPORT: {
-			columnName = postgresqlGetColumnNameByIndex(mkDBConnection, stm, index);
+			columnName = postgresqlGetColumnNameByIndex(conn, stm, index);
 			break;
 		}
 		case SODIUM_MYSQL_SUPPORT: {
-			columnName = mysqlGetColumnNameByIndex(mkDBConnection, stm, index);
+			columnName = mysqlGetColumnNameByIndex(conn, stm, index);
 			break;
 		}
 	}
@@ -727,20 +911,27 @@ DBINTERFACE_API const char * DBInt_GetColumnNameByIndex(DBInt_Connection *mkDBCo
 }
 
 
-DBINTERFACE_API int DBInt_GetColumnSize(DBInt_Connection *mkDBConnection, DBInt_Statement *stm, const char *columnName) {
+DBINTERFACE_API 
+int 
+DBInt_GetColumnSize(
+	DBInt_Connection * conn, 
+	DBInt_Statement * stm, 
+	const char * columnName
+) 
+{
 	int ret = 0;
-	if (mkDBConnection && columnName) {
-		switch (mkDBConnection->dbType) {
+	if (conn && columnName) {
+		switch (conn->dbType) {
 			case SODIUM_ORACLE_SUPPORT: {
-				ret = oracleGetColumnSize(mkDBConnection, stm, columnName);
+				ret = oracleGetColumnSize(conn, stm, columnName);
 				break;
 			}
 			case SODIUM_POSTGRESQL_SUPPORT: {
-				ret = postgresqlGetColumnSize(mkDBConnection, stm, columnName);
+				ret = postgresqlGetColumnSize(conn, stm, columnName);
 				break;
 			}
 			case SODIUM_MYSQL_SUPPORT: {
-				ret = mysqlGetColumnSize(mkDBConnection, stm, columnName);
+				ret = mysqlGetColumnSize(conn, stm, columnName);
 				break;
 			}
 		}
@@ -749,20 +940,27 @@ DBINTERFACE_API int DBInt_GetColumnSize(DBInt_Connection *mkDBConnection, DBInt_
 }
 
 
-DBINTERFACE_API HTSQL_COLUMN_TYPE DBInt_GetColumnType(DBInt_Connection *mkDBConnection, DBInt_Statement *stm, const char *columnName) {
-	HTSQL_COLUMN_TYPE ret = HTSQL_COLUMN_TYPE_NOTSET;
-	if (mkDBConnection && columnName) {
-		switch (mkDBConnection->dbType) {
+DBINTERFACE_API 
+SODIUM_DATABASE_COLUMN_TYPE 
+DBInt_GetColumnType(
+	DBInt_Connection * conn, 
+	DBInt_Statement *stm, 
+	const char *columnName
+) 
+{
+	SODIUM_DATABASE_COLUMN_TYPE ret = HTSQL_COLUMN_TYPE_NOTSET;
+	if (conn && columnName) {
+		switch (conn->dbType) {
 			case SODIUM_ORACLE_SUPPORT: {
-				ret = oracleGetColumnType(mkDBConnection, stm, columnName);
+				ret = oracleGetColumnType(conn, stm, columnName);
 				break;
 			}
 			case SODIUM_POSTGRESQL_SUPPORT: {
-				ret = postgresqlGetColumnType(mkDBConnection, stm, columnName);
+				ret = postgresqlGetColumnType(conn, stm, columnName);
 				break;
 			}
 			case SODIUM_MYSQL_SUPPORT: {
-				ret = mysqlGetColumnType(mkDBConnection, stm, columnName);
+				ret = mysqlGetColumnType(conn, stm, columnName);
 				break;
 			}
 		}

@@ -1,6 +1,16 @@
+#include "pch.h"
+
 #include "DBInt_delayLoaded_DLL_FuncImps.h"
 
-DBInt_Connection  *	DBInt_CreateDBConnectionNotImplemented(HANDLE heapHandle, DBInt_SupportedDatabaseType dbType, const char * dbName, const char * userName, const char * password) {
+DBInt_Connection  *	
+DBInt_CreateDBConnectionNotImplemented(
+	HANDLE heapHandle, 
+	DBInt_SupportedDatabaseType dbType, 
+	const char * dbName, 
+	const char * userName, 
+	const char * password
+)
+{
 	DBInt_Connection *mkConnection = (DBInt_Connection *)mkMalloc(heapHandle, sizeof(DBInt_Connection), __FILE__, __LINE__);
 	mkConnection->dbType = dbType;
 	mkConnection->heapHandle = heapHandle;
@@ -19,6 +29,9 @@ DBInt_Connection  *	DBInt_CreateDBConnectionNotImplemented(HANDLE heapHandle, DB
 	return mkConnection;
 }
 
-void DBInt_DestroyDBConnectionNotImplemented(DBInt_Connection *mkDBConnection) {
+void 
+DBInt_DestroyDBConnectionNotImplemented(
+	DBInt_Connection * conn)
+{
 	// Nothing to do
 }
