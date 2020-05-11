@@ -102,12 +102,12 @@ typedef struct {
 	int								bindedVariableCount;
 	MYSQL_BIND					  *	rs;
 	MYSQL_STMT					  * statement;
-	int								fieldCount;
 	//unsigned long long				currentRowNum;
 	BOOL							eof;
 	int								bindVariableCount;
-	Oid								*paramTypes;
-	int								*paramFormats;
+	Oid							   * paramTypes;
+	int							   * paramFormats;
+	unsigned long				   * sizeOfColumns; //An array of unsigned long integers representing the size of each column(not including any terminating null bytes).
 } DBInt_Statement_Mysql;
 
 typedef struct _DBInt_Statement  {

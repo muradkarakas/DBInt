@@ -23,6 +23,9 @@ DBInt_GetDatabaseType(
 			case SODIUM_POSTGRESQL_SUPPORT: {
 				return "postgresql";
 			}
+			case SODIUM_MYSQL_SUPPORT: {
+				return "mysql";
+			}
 		}
 	}
 	return NULL;
@@ -42,6 +45,10 @@ DBInt_GetDatabaseName(
 		}
 		case SODIUM_POSTGRESQL_SUPPORT: {
 			retval = postgresqlGetDatabaseName(DBIntConnection);
+			break;
+		}
+		case SODIUM_MYSQL_SUPPORT: {
+			retval = mysqlGetDatabaseName(DBIntConnection);
 			break;
 		}
 	}
@@ -129,6 +136,10 @@ DBInt_BindLob(
 			postgresqlBindLob(conn, stm, imageFileName, bindVariableName);
 			break;
 		}
+		case SODIUM_MYSQL_SUPPORT: {
+			mysqlBindLob(conn, stm, imageFileName, bindVariableName);
+			break;
+		}
 	}
 }
 
@@ -155,6 +166,10 @@ DBInt_GetLob(
 		}
 		case SODIUM_POSTGRESQL_SUPPORT: {
 			lobContent = postgresqlGetLob(conn, stm, columnName, sizeOfValue);
+			break;
+		}
+		case SODIUM_MYSQL_SUPPORT: {
+			lobContent = mysqlGetLob(conn, stm, columnName, sizeOfValue);
 			break;
 		}
 	}
