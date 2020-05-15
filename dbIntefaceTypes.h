@@ -17,6 +17,11 @@
 	typedef struct MYSQL_BIND MYSQL_BIND;
 	typedef struct MYSQL_STMT MYSQL_STMT;
 	typedef struct MYSQL MYSQL;
+	
+	/*	SQLSERVER Definitions */
+	typedef struct SQLHENV SQLHENV;
+	typedef struct SQLHDBC SQLHDBC;
+	typedef struct SQLHSTMT SQLHSTMT;
 #endif
 
 #ifdef DBIntPostgresql
@@ -27,6 +32,33 @@
 	typedef struct OCI_Statement OCI_Statement;
 	typedef struct OCI_Resultset OCI_Resultset;
 	typedef struct OCI_Connection OCI_Connection;
+
+	/*	MYSQL Definitions */
+	typedef struct MYSQL_BIND MYSQL_BIND;
+	typedef struct MYSQL_STMT MYSQL_STMT;
+	typedef struct MYSQL MYSQL;
+
+#endif
+
+#ifdef DBIntSqlServer
+
+	#include <sql.h>
+	#include <sqlext.h>
+	#include <stdio.h>
+	#include <conio.h>
+	#include <tchar.h>
+	#include <stdlib.h>
+	#include <sal.h>
+	
+	/*	Oracle Definitions */
+	typedef struct OCI_Statement OCI_Statement;
+	typedef struct OCI_Resultset OCI_Resultset;
+	typedef struct OCI_Connection OCI_Connection;
+
+	/*	PostgreSql Definitions */
+	typedef struct PGresult	PGresult;
+	typedef struct PGconn	PGconn;
+	typedef struct Oid	Oid;
 
 	/*	MYSQL Definitions */
 	typedef struct MYSQL_BIND MYSQL_BIND;
@@ -126,6 +158,7 @@ typedef struct {
 		OCI_Connection	*oracleHandle;
 		PGconn			*postgresqlHandle;
 		MYSQL			*mysqlHandle;
+		SQLHDBC			*sqlserverHandle;
 	} connection;
 	HANDLE                      heapHandle;
 	const char	 				  *errText;

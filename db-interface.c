@@ -6,6 +6,7 @@
 #include "..\DBInt-Oracle\oracle-interface.h"
 #include "..\DBInt-Postgresql\postgresql-interface.h"
 #include "..\DBInt-MySql\mysql-interface.h"
+#include "..\DBInt-SqlServer\sqlserver-interface.h"
 
 
 DBINTERFACE_API 
@@ -25,6 +26,9 @@ DBInt_GetDatabaseType(
 			}
 			case SODIUM_MYSQL_SUPPORT: {
 				return "mysql";
+			}
+			case SODIUM_SQLSERVER_SUPPORT: {
+				return "sqlserver";
 			}
 		}
 	}
@@ -103,6 +107,10 @@ DBInt_CreateDBConnection(
 		}
 		case SODIUM_MYSQL_SUPPORT: {
 			conn = mysqlCreateConnection(heapHandle, dbType, hostName, dbName, userName, password);
+			break;
+		}
+		case SODIUM_SQLSERVER_SUPPORT: {
+			conn = sqlserverCreateConnection(heapHandle, dbType, hostName, dbName, userName, password);
 			break;
 		}
 		default: {
