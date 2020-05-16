@@ -2,6 +2,8 @@
 
 #include <windows.h>
 
+#define HOST_NAME_LENGTH	50
+
 #if defined(DBInt) || defined(SodiumExtension) || defined(SodiumDebugger)
 	/*	Oracle Definitions */
 	typedef struct OCI_Statement OCI_Statement;
@@ -18,10 +20,16 @@
 	typedef struct MYSQL_STMT MYSQL_STMT;
 	typedef struct MYSQL MYSQL;
 	
-	/*	SQLSERVER Definitions */
-	typedef struct SQLHENV SQLHENV;
-	typedef struct SQLHDBC SQLHDBC;
-	typedef struct SQLHSTMT SQLHSTMT;
+	/*	MYSQL Definitions */
+	typedef INT64					SQLLEN;
+	typedef signed short            RETCODE;
+	typedef short					SQLSMALLINT;
+	typedef void				  * SQLHANDLE;
+	typedef SQLHANDLE               SQLHENV;
+	typedef SQLHANDLE               SQLHDBC;
+	typedef SQLHANDLE               SQLHSTMT;
+	typedef SQLHANDLE               SQLHDESC;
+	
 #endif
 
 #ifdef DBIntPostgresql
@@ -38,10 +46,20 @@
 	typedef struct MYSQL_STMT MYSQL_STMT;
 	typedef struct MYSQL MYSQL;
 
+	/*	SQLSERVER Definitions */
+	typedef INT64					SQLLEN;
+	typedef signed short            RETCODE;
+	typedef short					SQLSMALLINT;
+	typedef void* SQLHANDLE;
+	typedef struct SQLHENV			SQLHENV;
+	typedef struct SQLHDBC			SQLHDBC;
+	typedef struct SQLHSTMT			SQLHSTMT;
+
 #endif
 
 #ifdef DBIntSqlServer
 
+	#include <windows.h>
 	#include <sql.h>
 	#include <sqlext.h>
 	#include <stdio.h>
@@ -81,6 +99,15 @@
 	typedef struct MYSQL_STMT MYSQL_STMT;
 	typedef struct MYSQL MYSQL;
 
+	/*	SQLSERVER Definitions */
+	typedef INT64					SQLLEN;
+	typedef signed short            RETCODE;
+	typedef short					SQLSMALLINT;
+	typedef void* SQLHANDLE;
+	typedef struct SQLHENV			SQLHENV;
+	typedef struct SQLHDBC			SQLHDBC;
+	typedef struct SQLHSTMT			SQLHSTMT;
+
 #endif
 
 #ifdef DBIntMySql
@@ -96,6 +123,15 @@
 	typedef struct PGresult	PGresult;
 	typedef struct PGconn	PGconn;
 	typedef struct Oid	Oid;
+
+	/*	SQLSERVER Definitions */
+	typedef INT64					SQLLEN;
+	typedef signed short            RETCODE;
+	typedef short					SQLSMALLINT;
+	typedef void				  * SQLHANDLE;
+	typedef struct SQLHENV			SQLHENV;
+	typedef struct SQLHDBC			SQLHDBC;
+	typedef struct SQLHSTMT			SQLHSTMT;
 
 #endif
 
@@ -142,23 +178,32 @@ typedef struct {
 	unsigned long				   * sizeOfColumns; //An array of unsigned long integers representing the size of each column(not including any terminating null bytes).
 } DBInt_Statement_Mysql;
 
+
+typedef struct {
+	SQLHSTMT    *hStmt;
+	SQLSMALLINT sNumResults;
+	SQLLEN		cRowCount;
+} DBInt_Statement_SqlServer;
+
 typedef struct _DBInt_Statement  {
 	union {
 		DBInt_Statement_Oracle		oracle;
 		DBInt_Statement_Postgresql	postgresql;
 		DBInt_Statement_Mysql		mysql;
+		DBInt_Statement_SqlServer	sqlserver;
 	} statement;
 } DBInt_Statement;
 
 	
 typedef struct {
-	char					  hostName[15];
+	char		hostName[HOST_NAME_LENGTH];
+	wchar_t			   * connection_string;
 	DBInt_SupportedDatabaseType		dbType;
 	union {
 		OCI_Connection	*oracleHandle;
 		PGconn			*postgresqlHandle;
 		MYSQL			*mysqlHandle;
-		SQLHDBC			*sqlserverHandle;
+		SQLHDBC			* sqlserverHandle;
 	} connection;
 	HANDLE                      heapHandle;
 	const char	 				  *errText;

@@ -6,8 +6,6 @@
 
 #include "..\SodiumShared\SodiumShared.h"
 
-#define HOST_NAME_LENGTH	50
-
 typedef enum {
 	HTSQL_COLUMN_TYPE_NOTSET,
 	HTSQL_COLUMN_TYPE_TEXT,

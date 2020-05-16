@@ -81,6 +81,10 @@ DBInt_InitConnection(
 			mysqlInitConnection(conn);
 			break;
 		}
+		case SODIUM_SQLSERVER_SUPPORT: {
+			sqlserverInitConnection(conn);
+			break;
+		}
 	}
 }
 
@@ -356,6 +360,10 @@ DBInt_ExecuteSelectStatement(
 				mysqlExecuteSelectStatement(conn, stm, sql);
 				break;
 			}
+			case SODIUM_SQLSERVER_SUPPORT: {
+				sqlserverExecuteSelectStatement(conn, stm, sql);
+				break;
+			}
 		}
 	}
 }
@@ -379,6 +387,10 @@ DBInt_Prepare(
 		}
 		case SODIUM_MYSQL_SUPPORT: {
 			mysqlPrepare(conn, stm, sql);
+			break;
+		}
+		case SODIUM_SQLSERVER_SUPPORT: {
+			sqlserverPrepare(conn, stm, sql);
 			break;
 		}
 	}
@@ -668,6 +680,10 @@ DBInt_CreateStatement(
 		}
 		case SODIUM_MYSQL_SUPPORT: {
 			retval = mysqlCreateStatement(conn);
+			break;
+		}
+		case SODIUM_SQLSERVER_SUPPORT: {
+			retval = sqlserverCreateStatement(conn);
 			break;
 		}
 	}
