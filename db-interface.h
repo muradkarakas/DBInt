@@ -23,7 +23,16 @@ void								DBInt_InitConnection(DBInt_Connection * conn);
 DBINTERFACE_API BOOL				DBInt_IsDatabaseSupported(DBInt_SupportedDatabaseType dbType);
 DBINTERFACE_API int					DBInt_IsConnectionOpen(DBInt_Connection *conn);
 
-DBINTERFACE_API DBInt_Connection  *	DBInt_CreateDBConnection(HANDLE heapHandle, DBInt_SupportedDatabaseType dbType, const char * hostName, const char * dbName, const char * userName, const char * password);
+DBINTERFACE_API 
+DBInt_Connection  *	
+DBInt_CreateDBConnection(
+	HANDLE heapHandle, 
+	DBInt_SupportedDatabaseType dbType, 
+	const char * hostName, 
+	const char * instanceName, 
+	const char * databaseName, 
+	const char * userName, 
+	const char * password);
 
 DBINTERFACE_API void				DBInt_DestroyDBConnection(DBInt_Connection *conn);
 DBINTERFACE_API int					DBInt_IsEof(DBInt_Connection *conn, DBInt_Statement *stm);

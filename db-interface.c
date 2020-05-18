@@ -91,30 +91,31 @@ DBInt_InitConnection(
 DBINTERFACE_API 
 DBInt_Connection *
 DBInt_CreateDBConnection(
-	HANDLE heapHandle, 
-	DBInt_SupportedDatabaseType dbType, 
+	HANDLE heapHandle,
+	DBInt_SupportedDatabaseType dbType,
 	const char * hostName,
-	const char * dbName, 
-	const char * userName, 
+	const char * instanceName,
+	const char * databaseName,
+	const char * userName,
 	const char * password
 )
 {
 	DBInt_Connection * conn = NULL;
 	switch (dbType) {
 		case SODIUM_ORACLE_SUPPORT: {
-			conn = oracleCreateConnection(heapHandle, dbType, dbName, userName, password);			
+			conn = oracleCreateConnection(heapHandle, dbType, instanceName, userName, password);
 			break;
 		}
 		case SODIUM_POSTGRESQL_SUPPORT: {
-			conn = postgresqlCreateConnection(heapHandle, dbType, hostName, dbName, userName, password);
+			conn = postgresqlCreateConnection(heapHandle, dbType, hostName, instanceName, userName, password);
 			break;
 		}
 		case SODIUM_MYSQL_SUPPORT: {
-			conn = mysqlCreateConnection(heapHandle, dbType, hostName, dbName, userName, password);
+			conn = mysqlCreateConnection(heapHandle, dbType, hostName, instanceName, userName, password);
 			break;
 		}
 		case SODIUM_SQLSERVER_SUPPORT: {
-			conn = sqlserverCreateConnection(heapHandle, dbType, hostName, dbName, userName, password);
+			conn = sqlserverCreateConnection(heapHandle, dbType, hostName, instanceName, databaseName, userName, password);
 			break;
 		}
 		default: {
@@ -278,6 +279,10 @@ DBInt_ExecuteAnonymousBlock(
 			}
 			case SODIUM_MYSQL_SUPPORT: {
 				mysqlExecuteAnonymousBlock(conn, stm, sql);
+				break;
+			}
+			case SODIUM_SQLSERVER_SUPPORT: {
+				sqlserverExecuteAnonymousBlock(conn, stm, sql);
 				break;
 			}
 		}
@@ -446,6 +451,10 @@ DBInt_BindString(
 			mysqlBindString(conn, stm, bindVariableName, bindVariableValue, valueLength);
 			break;
 		}
+		case SODIUM_SQLSERVER_SUPPORT: {
+			sqlserverBindString(conn, stm, bindVariableName, bindVariableValue, valueLength);
+			break;
+		}
 	}
 }
 
@@ -470,6 +479,10 @@ DBInt_BindNumber(
 		}
 		case SODIUM_MYSQL_SUPPORT: {
 			mysqlBindNumber(conn, stm, bindVariableName, bindVariableValue, valueLength);
+			break;
+		}
+		case SODIUM_SQLSERVER_SUPPORT: {
+			sqlserverBindNumber(conn, stm, bindVariableName, bindVariableValue, valueLength);
 			break;
 		}
 	}
@@ -713,6 +726,10 @@ DBInt_FreeStatement(
 		}
 		case SODIUM_MYSQL_SUPPORT: {
 			mysqlFreeStatement(conn, stm);
+			break;
+		}
+		case SODIUM_SQLSERVER_SUPPORT: {
+			sqlserverFreeStatement(conn, stm);
 			break;
 		}
 	}

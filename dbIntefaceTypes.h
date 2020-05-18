@@ -21,10 +21,12 @@
 	typedef struct MYSQL MYSQL;
 	
 	/*	SQL SERVER Definitions */
+	typedef unsigned short			SQLUSMALLINT;
+	typedef short					SQLSMALLINT;
+	typedef SQLSMALLINT				SQLRETURN;
 	typedef struct BINDING			BINDING;
 	typedef INT64					SQLLEN;
 	typedef signed short            RETCODE;
-	typedef short					SQLSMALLINT;
 	typedef void				  * SQLHANDLE;
 	typedef SQLHANDLE               SQLHENV;
 	typedef SQLHANDLE               SQLHDBC;
@@ -47,11 +49,13 @@
 	typedef struct MYSQL_STMT MYSQL_STMT;
 	typedef struct MYSQL MYSQL;
 
-	/*	SQLSERVER Definitions */
+	/*	SQL SERVER Definitions */
+	typedef unsigned short			SQLUSMALLINT;
+	typedef short					SQLSMALLINT;
+	typedef SQLSMALLINT				SQLRETURN;
 	typedef struct BINDING			BINDING;
 	typedef INT64					SQLLEN;
 	typedef signed short            RETCODE;
-	typedef short					SQLSMALLINT;
 	typedef void* SQLHANDLE;
 	typedef struct SQLHENV			SQLHENV;
 	typedef struct SQLHDBC			SQLHDBC;
@@ -110,11 +114,13 @@
 	typedef struct MYSQL_STMT MYSQL_STMT;
 	typedef struct MYSQL MYSQL;
 
-	/*	SQLSERVER Definitions */
+	/*	SQL SERVER Definitions */
+	typedef unsigned short			SQLUSMALLINT;
+	typedef short					SQLSMALLINT;
+	typedef SQLSMALLINT				SQLRETURN;
 	typedef struct BINDING			BINDING; 
 	typedef INT64					SQLLEN;
 	typedef signed short            RETCODE;
-	typedef short					SQLSMALLINT;
 	typedef void* SQLHANDLE;
 	typedef struct SQLHENV			SQLHENV;
 	typedef struct SQLHDBC			SQLHDBC;
@@ -136,11 +142,13 @@
 	typedef struct PGconn	PGconn;
 	typedef struct Oid	Oid;
 
-	/*	SQLSERVER Definitions */
+	/*	SQL SERVER Definitions */
+	typedef short					SQLSMALLINT;
+	typedef unsigned short			SQLUSMALLINT;
+	typedef SQLSMALLINT				SQLRETURN;
 	typedef struct BINDING			BINDING;
 	typedef INT64					SQLLEN;
 	typedef signed short            RETCODE;
-	typedef short					SQLSMALLINT;
 	typedef void				  * SQLHANDLE;
 	typedef struct SQLHENV			SQLHENV;
 	typedef struct SQLHDBC			SQLHDBC;
