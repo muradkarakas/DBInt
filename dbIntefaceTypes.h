@@ -20,7 +20,8 @@
 	typedef struct MYSQL_STMT MYSQL_STMT;
 	typedef struct MYSQL MYSQL;
 	
-	/*	MYSQL Definitions */
+	/*	SQL SERVER Definitions */
+	typedef struct BINDING			BINDING;
 	typedef INT64					SQLLEN;
 	typedef signed short            RETCODE;
 	typedef short					SQLSMALLINT;
@@ -47,6 +48,7 @@
 	typedef struct MYSQL MYSQL;
 
 	/*	SQLSERVER Definitions */
+	typedef struct BINDING			BINDING;
 	typedef INT64					SQLLEN;
 	typedef signed short            RETCODE;
 	typedef short					SQLSMALLINT;
@@ -83,6 +85,15 @@
 	typedef struct MYSQL_STMT MYSQL_STMT;
 	typedef struct MYSQL MYSQL;
 
+	typedef struct STR_BINDING {
+		SQLLEN				rowDataCharacterCount;
+		char			  * chRowData;
+		WCHAR			  * wRowData;            
+		char			  * columnName;           
+		SQLLEN              indPtr;             
+		BOOL                fChar;               
+	} BINDING;
+
 #endif
 
 #ifdef DBIntOracle
@@ -100,6 +111,7 @@
 	typedef struct MYSQL MYSQL;
 
 	/*	SQLSERVER Definitions */
+	typedef struct BINDING			BINDING; 
 	typedef INT64					SQLLEN;
 	typedef signed short            RETCODE;
 	typedef short					SQLSMALLINT;
@@ -125,6 +137,7 @@
 	typedef struct Oid	Oid;
 
 	/*	SQLSERVER Definitions */
+	typedef struct BINDING			BINDING;
 	typedef INT64					SQLLEN;
 	typedef signed short            RETCODE;
 	typedef short					SQLSMALLINT;
@@ -181,7 +194,9 @@ typedef struct {
 
 typedef struct {
 	SQLHSTMT    *hStmt;
-	SQLSMALLINT sNumResults;
+	BOOL		isEof;
+	BINDING		*resultSet;
+	SQLSMALLINT cColCount;
 	SQLLEN		cRowCount;
 } DBInt_Statement_SqlServer;
 

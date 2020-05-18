@@ -659,6 +659,10 @@ DBInt_Seek(
 			mysqlSeek(conn, stm, rowNum);
 			break;
 		}
+		case SODIUM_SQLSERVER_SUPPORT: {
+			sqlserverSeek(conn, stm, rowNum);
+			break;
+		}
 	}
 }
 
@@ -732,6 +736,10 @@ int DBInt_Next(
 		}
 		case SODIUM_MYSQL_SUPPORT: {
 			retval = mysqlNext(stm);
+			break;
+		}
+		case SODIUM_SQLSERVER_SUPPORT: {
+			retval = sqlserverNext(conn, stm);
 			break;
 		}
 	}
@@ -831,6 +839,10 @@ DBInt_IsEof(
 			retval = mysqlIsEof(stm);
 			break;
 		}
+		case SODIUM_SQLSERVER_SUPPORT: {
+			retval = sqlserverIsEof(conn, stm);
+			break;
+		}
 	}
 	return retval;
 }
@@ -915,6 +927,10 @@ DBInt_GetColumnValueByColumnName(
 			}
 			case SODIUM_MYSQL_SUPPORT: {
 				ret = mysqlGetColumnValueByColumnName(conn, stm, columnName);
+				break;
+			}
+			case SODIUM_SQLSERVER_SUPPORT: {
+				ret = sqlserverGetColumnValueByColumnName(conn, stm, columnName);
 				break;
 			}
 		}
