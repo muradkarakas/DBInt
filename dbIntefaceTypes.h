@@ -4,6 +4,15 @@
 
 #define HOST_NAME_LENGTH	50
 
+typedef enum {
+	HTSQL_COLUMN_TYPE_NOTSET,
+	HTSQL_COLUMN_TYPE_TEXT,
+	HTSQL_COLUMN_TYPE_NUMBER,
+	HTSQL_COLUMN_TYPE_LOB,
+	HTSQL_COLUMN_TYPE_DATE,
+	HTSQL_COLUMN_TYPE_OBJECT
+} SODIUM_DATABASE_COLUMN_TYPE;
+
 #if defined(DBInt) || defined(SodiumExtension) || defined(SodiumDebugger)
 	/*	Oracle Definitions */
 	typedef struct OCI_Statement OCI_Statement;
@@ -95,7 +104,7 @@
 		WCHAR			  * wRowData;            
 		char			  * columnName;           
 		SQLLEN              indPtr;             
-		BOOL                fChar;               
+		SODIUM_DATABASE_COLUMN_TYPE		dataType;
 	} BINDING;
 
 #endif
@@ -200,12 +209,21 @@ typedef struct {
 } DBInt_Statement_Mysql;
 
 
+typedef struct ODBC_BINDING {
+	wchar_t		  * buffer;
+	size_t			buffer_length;
+	SQLSMALLINT     fCType;
+	SQLLEN			pcbValue;
+} ODBC_BINDING;
+
 typedef struct {
-	SQLHSTMT    *hStmt;
-	BOOL		isEof;
-	BINDING		*resultSet;
-	SQLSMALLINT cColCount;
-	SQLLEN		cRowCount;
+	SQLHSTMT	  * hStmt;
+	BOOL			isEof;
+	BINDING		  * resultSet;
+	SQLSMALLINT		cColCount;
+	SQLLEN			cRowCount;
+	SQLSMALLINT		ParameterCount;
+	ODBC_BINDING  * bindVariables;
 } DBInt_Statement_SqlServer;
 
 typedef struct _DBInt_Statement  {

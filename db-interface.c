@@ -254,6 +254,10 @@ DBInt_ExecuteDeleteStatement(
 				mysqlExecuteDeleteStatement(conn, stm, sql);
 				break;
 			}
+			case SODIUM_SQLSERVER_SUPPORT: {
+				sqlserverExecuteDeleteStatement(conn, stm, sql);
+				break;
+			}
 		}
 	}
 }
@@ -310,6 +314,10 @@ DBInt_ExecuteUpdateStatement(
 			}
 			case SODIUM_MYSQL_SUPPORT: {
 				mysqlExecuteUpdateStatement(conn, stm, sql);
+				break;
+			}
+			case SODIUM_SQLSERVER_SUPPORT: {
+				sqlserverExecuteUpdateStatement(conn, stm, sql);
 				break;
 			}
 		}
@@ -421,6 +429,10 @@ DBInt_ExecuteInsertStatement(
 			}
 			case SODIUM_MYSQL_SUPPORT: {
 				retval = mysqlExecuteInsertStatement(conn, stm, sql);
+				break;
+			}
+			case SODIUM_SQLSERVER_SUPPORT: {
+				retval = sqlserverExecuteInsertStatement(conn, stm, sql);
 				break;
 			}
 		}
@@ -581,6 +593,10 @@ DBInt_Commit(
 			retval = mysqlCommit(conn);
 			break;
 		}
+		case SODIUM_SQLSERVER_SUPPORT: {
+			retval = sqlserverCommit(conn);
+			break;
+		}
 	}
 	return retval;
 }
@@ -643,6 +659,11 @@ DBInt_GetLastErrorText(
 		}
 		case SODIUM_POSTGRESQL_SUPPORT: {
 			retval = postgresqlGetLastErrorText(conn);
+			break;
+		}
+		
+		case SODIUM_SQLSERVER_SUPPORT: {
+			retval = sqlserverGetLastErrorText(conn);
 			break;
 		}
 	}
@@ -870,7 +891,7 @@ DBInt_IsDatabaseSupported(
 	DBInt_SupportedDatabaseType dbType
 )
 {
-	return (dbType == SODIUM_ORACLE_SUPPORT || dbType == SODIUM_POSTGRESQL_SUPPORT || dbType == SODIUM_MYSQL_SUPPORT);
+	return (dbType == SODIUM_ORACLE_SUPPORT || dbType == SODIUM_POSTGRESQL_SUPPORT || dbType == SODIUM_MYSQL_SUPPORT || dbType == SODIUM_SQLSERVER_SUPPORT);
 }
 
 DBINTERFACE_API 
@@ -1033,6 +1054,10 @@ DBInt_GetColumnType(
 			}
 			case SODIUM_MYSQL_SUPPORT: {
 				ret = mysqlGetColumnType(conn, stm, columnName);
+				break;
+			}
+			case SODIUM_SQLSERVER_SUPPORT: {
+				ret = sqlserverGetColumnType(conn, stm, columnName);
 				break;
 			}
 		}

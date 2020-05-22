@@ -6,15 +6,6 @@
 
 #include "..\SodiumShared\SodiumShared.h"
 
-typedef enum {
-	HTSQL_COLUMN_TYPE_NOTSET,
-	HTSQL_COLUMN_TYPE_TEXT,
-	HTSQL_COLUMN_TYPE_NUMBER,
-	HTSQL_COLUMN_TYPE_LOB,
-	HTSQL_COLUMN_TYPE_DATE,
-	HTSQL_COLUMN_TYPE_OBJECT
-} SODIUM_DATABASE_COLUMN_TYPE;
-	
 
 /*	\brief	Private functions	*/
 void								DBInt_InitConnection(DBInt_Connection * conn);
@@ -48,8 +39,15 @@ DBINTERFACE_API BOOL				DBInt_Commit(DBInt_Connection *conn);
 DBINTERFACE_API BOOL				DBInt_Rollback(DBInt_Connection *conn);
 DBINTERFACE_API void				DBInt_RegisterString(DBInt_Connection *conn, DBInt_Statement *stm, const char *bindVariableName, int maxLength);
 DBINTERFACE_API unsigned int		DBInt_GetAffectedRows(DBInt_Connection *conn, DBInt_Statement *stm);
+
+
+//	ODBC C library requires parameter index to bind parameter value. (Parameters are numbered in increasing parameter order in the SQL statement, starting with the number 1)
+//	That is, ODBC does not use named parameter variable for DML statements, so client application must send the index of parameter in type char*. 
+//	ODBC implementation of DBInt interface will convert 'bindVariableName' parameter to int and bind 'bindVariableValue' to the corresponding variable.
+//	This situation does not apply to other database C client libraries 
 DBINTERFACE_API void				DBInt_BindString(DBInt_Connection *conn, DBInt_Statement *stm, char *bindVariableName, char *bindVariableValue, size_t valueLength);
 DBINTERFACE_API void				DBInt_BindNumber(DBInt_Connection *conn, DBInt_Statement *stm, char *bindVariableName, char *bindVariableValue, size_t valueLength);
+
 DBINTERFACE_API void				DBInt_ExecuteAnonymousBlock(DBInt_Connection *conn, DBInt_Statement *stm, const char *sql);
 DBINTERFACE_API void				DBInt_ExecuteSelectStatement(DBInt_Connection *conn, DBInt_Statement *stm, const char *sql);
 DBINTERFACE_API void				DBInt_ExecuteDescribe(DBInt_Connection *conn, DBInt_Statement *stm, const char *sql);
