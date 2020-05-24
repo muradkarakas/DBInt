@@ -43,6 +43,7 @@ typedef enum {
 	typedef struct MYSQL MYSQL;
 	
 	/*	SQL SERVER Definitions */
+	typedef UINT64					SQLULEN;
 	typedef unsigned short			SQLUSMALLINT;
 	typedef short					SQLSMALLINT;
 	typedef SQLSMALLINT				SQLRETURN;
@@ -72,6 +73,7 @@ typedef enum {
 	typedef struct MYSQL MYSQL;
 
 	/*	SQL SERVER Definitions */
+	typedef UINT64					SQLULEN;
 	typedef unsigned short			SQLUSMALLINT;
 	typedef short					SQLSMALLINT;
 	typedef SQLSMALLINT				SQLRETURN;
@@ -137,6 +139,7 @@ typedef enum {
 	typedef struct MYSQL MYSQL;
 
 	/*	SQL SERVER Definitions */
+	typedef UINT64					SQLULEN;
 	typedef unsigned short			SQLUSMALLINT;
 	typedef short					SQLSMALLINT;
 	typedef SQLSMALLINT				SQLRETURN;
@@ -165,6 +168,7 @@ typedef enum {
 	typedef struct Oid	Oid;
 
 	/*	SQL SERVER Definitions */
+	typedef UINT64					SQLULEN;
 	typedef short					SQLSMALLINT;
 	typedef unsigned short			SQLUSMALLINT;
 	typedef SQLSMALLINT				SQLRETURN;
