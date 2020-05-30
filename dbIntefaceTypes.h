@@ -116,7 +116,7 @@ typedef enum {
 	typedef struct STR_BINDING {
 		SQLLEN				rowDataCharacterCount;
 		char			  * chRowData;
-		WCHAR			  * wRowData;            
+		wchar_t			  * wRowData;            
 		char			  * columnName;           
 		SQLLEN              indPtr;             
 		SODIUM_DATABASE_COLUMN_TYPE		dataType;
